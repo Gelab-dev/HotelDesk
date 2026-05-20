@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Reserva {
+  id          String   @id @default(cuid())
+  habitacion  String
+  nombre      String
+  apellido    String
+  fecha       DateTime
+  turno       String
+  sinTacc     Boolean  @default(false)
+  sinLactosa  Boolean  @default(false)
+  vegetariano Boolean  @default(false)
+  vegano      Boolean  @default(false)
+  comentarios String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([habitacion, nombre, apellido, fecha])
+}
+
+model HuespedDemo {
+  id         String   @id @default(cuid())
+  habitacion String
+  nombre     String
+  apellido   String
+  checkIn    DateTime
+  checkOut   DateTime
+
+  @@unique([habitacion, nombre, apellido])
+}
+
+model Configuracion {
+  id        String  @id @default("config")
+  bloqueado Boolean @default(false)
+}
