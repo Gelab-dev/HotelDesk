@@ -6,8 +6,8 @@ import { Reserva } from '@/types'
 import { useReservas } from '@/hooks/useReservas'
 import { useBuscador } from '@/hooks/useBuscador'
 import { parseJsonIfOk } from '@/lib/parse-json-response'
-import { CUPO_POR_TURNO, TURNOS } from '@/services/reservas.service'
-import type { ResultadoImportacionGrupos } from '@/services/grupos.service'
+import { CUPO_POR_TURNO, TURNOS } from '@/lib/reservas-const'
+import type { ResultadoImportacionGrupos } from '@/types/grupos'
 
 const formatFecha = (date: Date) =>
   date.toLocaleDateString('es-AR', {

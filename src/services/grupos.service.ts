@@ -1,19 +1,10 @@
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 import { crearReserva } from '@/services/reservas.service'
 import { ValidacionApiError } from '@/lib/validation-error'
+import type { ErrorFilaImportacion, ResultadoImportacionGrupos } from '@/types/grupos'
 
 /** Tamaño máximo del archivo de carga (2 MiB). */
 export const GRUPOS_EXCEL_BYTES_MAX = 2 * 1024 * 1024
-
-export type ErrorFilaImportacion = { fila: number; mensaje: string }
-
-export type ResultadoImportacionGrupos = {
-  creadas: number
-  duplicadasOmitidas: number
-  filasVacias: number
-  filasTotalesDatos: number
-  errores: ErrorFilaImportacion[]
-}
 
 function sinDiacriticos(s: string): string {
   return s
@@ -211,38 +202,33 @@ export async function importarFilasCanonico(
  * Lee buffer .xlsx / .xls: primera hoja; primera fila = encabezados.
  */
 export async function importarGruposDesdeExcel(
-  buf: Buffer | ArrayBuffer
+  buf: ArrayBuffer
 ): Promise<ResultadoImportacionGrupos> {
-  const workbook = XLSX.read(buf, { type: 'buffer', cellDates: true })
+  const wb = new ExcelJS.Workbook()
+  await wb.xlsx.load(buf)
 
-  const name = workbook.SheetNames[0]
-  if (!name) {
+  const sheet = wb.worksheets[0]
+  if (!sheet) {
     throw new ValidacionApiError('El archivo no tiene hojas de cálculo.', 400)
   }
 
-  const sheet = workbook.Sheets[name]
-  const matriz = XLSX.utils.sheet_to_json<(string | number | boolean | Date | null | undefined)[]>(
-    sheet,
-    {
-      header: 1,
-      defval: null,
-      blankrows: true,
-    }
-  )
+  const headerRow = sheet.getRow(1)
+  const headers = Array.isArray(headerRow.values)
+    ? (headerRow.values as unknown[]).slice(1)
+    : []
 
-  if (!matriz.length || !matriz[0]?.length) {
+  if (!headers.length) {
     throw new ValidacionApiError(
       'No se encontraron filas ni encabezados en la primera hoja.',
       400
     )
   }
 
-  const encabezadosFila = matriz[0] as unknown[]
   const indices: Record<string, number> = {}
-  encabezadosFila.forEach((titulo, colIdx) => {
-    const canon = canonicoEncabezado(String(titulo ?? ''))
-    if (canon) indices[canon] = colIdx
-  })
+  for (let i = 0; i < headers.length; i++) {
+    const canon = canonicoEncabezado(String(headers[i] ?? ''))
+    if (canon) indices[canon] = i + 1 // 1-based (ExcelJS)
+  }
 
   const requeridas = ['habitacion', 'nombre', 'apellido', 'fecha', 'turno'] as const
   const faltan = requeridas.filter(clave => indices[clave] === undefined)
@@ -256,15 +242,15 @@ export async function importarGruposDesdeExcel(
 
   const filasNumeradas: FilaImportacionCanonica[] = []
 
-  for (let r = 1; r < matriz.length; r++) {
-    const filaExcel = matriz[r] ?? []
+  for (let r = 2; r <= sheet.rowCount; r++) {
+    const row = sheet.getRow(r)
     const rec: Record<string, unknown> = {}
     for (const clave of Object.keys(indices)) {
       const colIdx = indices[clave]
-      rec[clave] = filaExcel[colIdx] ?? null
+      rec[clave] = row.getCell(colIdx).value ?? null
     }
     filasNumeradas.push({
-      numeroFilaExcel: r + 1,
+      numeroFilaExcel: r,
       valores: rec,
     })
   }

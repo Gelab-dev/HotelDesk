@@ -1,17 +1,11 @@
 import prisma from '@/lib/prisma'
 import { ValidacionApiError } from '@/lib/validation-error'
 import { capitalizar, normalizar } from '@/lib/normalizar'
-
-/** Cupo fijo por turno (desayuno) */
-export const CUPO_POR_TURNO = 24
-
-export const TURNOS = ['07:30', '08:30', '09:30'] as const
-
-export type TurnoReserva = (typeof TURNOS)[number]
-
-export function esTurnoValido(turno: string): turno is TurnoReserva {
-  return (TURNOS as readonly string[]).includes(turno)
-}
+import {
+  CUPO_POR_TURNO,
+  TURNOS,
+  esTurnoValido,
+} from '@/lib/reservas-const'
 
 function getRangoDia(fecha: string) {
   const inicio = new Date(fecha)

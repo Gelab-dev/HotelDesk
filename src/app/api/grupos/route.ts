@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const buffer = Buffer.from(await archivo.arrayBuffer())
+    const buffer = await archivo.arrayBuffer()
     const resultado = await importarGruposDesdeExcel(buffer)
     return NextResponse.json(resultado, { status: 200 })
   } catch (e) {

@@ -1,17 +1,19 @@
 import {
-  CUPO_POR_TURNO,
-  TURNOS,
   getReservasPorFecha,
 } from '@/services/reservas.service'
+import { CUPO_POR_TURNO, TURNOS } from '@/lib/reservas-const'
+
+// Excel en es-AR suele esperar ';' como separador.
+const CSV_DELIM = ';'
 
 function escaparCsv(celda: string | number | boolean): string {
   const s = celda === null || celda === undefined ? '' : String(celda)
-  if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`
+  if (new RegExp(`[\"\\r\\n${CSV_DELIM}]`).test(s)) return `"${s.replace(/"/g, '""')}"`
   return s
 }
 
 function filaCsv(celdas: (string | number | boolean)[]): string {
-  return celdas.map(escaparCsv).join(',')
+  return celdas.map(escaparCsv).join(CSV_DELIM)
 }
 
 /** Resumen por turno + detalle de todas las reservas del día */
@@ -65,6 +67,8 @@ export async function generarCsvReporteDesayunos(fechaIso: string): Promise<stri
 
   const lineas: string[] = []
 
+  // Pista para Excel sobre el separador.
+  lineas.push(`sep=${CSV_DELIM}`)
   lineas.push(filaCsv(['Reporte de desayunos', `Fecha: ${fechaIso}`]))
   lineas.push('')
   lineas.push(

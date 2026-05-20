@@ -5,7 +5,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import xlsx from 'xlsx'
+import ExcelJS from 'exceljs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.join(__dirname, '..')
@@ -40,22 +40,26 @@ const datos = [
   ],
 ]
 
-const ws = xlsx.utils.aoa_to_sheet(datos)
-ws['!cols'] = [
-  { wch: 12 },
-  { wch: 14 },
-  { wch: 14 },
-  { wch: 12 },
-  { wch: 8 },
-  { wch: 10 },
-  { wch: 11 },
-  { wch: 12 },
-  { wch: 8 },
-  { wch: 40 },
+const wb = new ExcelJS.Workbook()
+const ws = wb.addWorksheet('Reservas')
+
+ws.addRows(datos)
+ws.columns = [
+  { width: 12 },
+  { width: 14 },
+  { width: 14 },
+  { width: 12 },
+  { width: 10 },
+  { width: 10 },
+  { width: 12 },
+  { width: 12 },
+  { width: 10 },
+  { width: 48 },
 ]
 
-const wb = xlsx.utils.book_new()
-xlsx.utils.book_append_sheet(wb, ws, 'Reservas')
-xlsx.writeFile(wb, outPath)
+// Encabezados en negrita
+ws.getRow(1).font = { bold: true }
+
+await wb.xlsx.writeFile(outPath)
 
 console.log('Escrito:', outPath)
