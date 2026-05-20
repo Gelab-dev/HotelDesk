@@ -162,6 +162,16 @@
   .inlineAlertClose:hover {
     opacity: 1;
   }
+
+  .link {
+    margin-top: 15px;
+    text-decoration: none;
+    color:#626262;
+    font-weight: bold;  
+  }
+  .link:hover {
+    color: #1A1A22;
+  }
   
   .topbar {
     display: flex;

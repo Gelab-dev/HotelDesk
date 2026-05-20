@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, type ChangeEvent } from 'react'
+import Link from 'next/link'
 import styles from './PanelAdmin.module.css'
 import { Reserva } from '@/types'
 import { useReservas } from '@/hooks/useReservas'
@@ -218,7 +219,7 @@ export default function PanelAdmin() {
             onClick={abrirSelectorExcelGrupos}
             disabled={loading || importandoGrupos}
           >
-            {importandoGrupos ? '📤 Importando…' : '📤 Carga masiva'}
+            {importandoGrupos ? '📤 Importando…' : '📤 Carga grupal'}
           </button>
           <a
             href="/plantilla-grupos.xlsx"
@@ -475,6 +476,7 @@ export default function PanelAdmin() {
             )}
 
           </div>
+          <Link href='/' className={styles.link}>Volver a la vista de reserva.</Link>
         </div>
       </div>
 

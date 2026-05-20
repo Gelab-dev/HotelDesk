@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import styles from './FormularioReserva.module.css'
 import { useVerificarHuesped } from '@/hooks/useVerificarHuesped'
 import { useDisponibilidad } from '@/hooks/useDisponibilidad'
@@ -371,6 +372,7 @@ export default function FormularioReserva({ bloqueado }: { bloqueado: boolean })
 
         </div>
       </div>
+        <Link href='/admin' className={styles.link}>Ingresá acá para ver el panel de control desde donde se administran los turnos.</Link>
     </div>
   )
 }
