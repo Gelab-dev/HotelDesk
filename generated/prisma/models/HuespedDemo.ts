@@ -1023,6 +1023,7 @@ export type HuespedDemoCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many HuespedDemos.
    */
   data: Prisma.HuespedDemoCreateManyInput | Prisma.HuespedDemoCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1041,6 +1042,7 @@ export type HuespedDemoCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many HuespedDemos.
    */
   data: Prisma.HuespedDemoCreateManyInput | Prisma.HuespedDemoCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

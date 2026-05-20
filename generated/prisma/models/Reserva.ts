@@ -1236,6 +1236,7 @@ export type ReservaCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many Reservas.
    */
   data: Prisma.ReservaCreateManyInput | Prisma.ReservaCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1254,6 +1255,7 @@ export type ReservaCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many Reservas.
    */
   data: Prisma.ReservaCreateManyInput | Prisma.ReservaCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

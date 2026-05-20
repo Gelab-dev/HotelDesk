@@ -904,6 +904,7 @@ export type ConfiguracionCreateManyArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many Configuracions.
    */
   data: Prisma.ConfiguracionCreateManyInput | Prisma.ConfiguracionCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -922,6 +923,7 @@ export type ConfiguracionCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * The data used to create many Configuracions.
    */
   data: Prisma.ConfiguracionCreateManyInput | Prisma.ConfiguracionCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

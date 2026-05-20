@@ -1,28 +1,40 @@
 -- CreateTable
 CREATE TABLE "Reserva" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "habitacion" TEXT NOT NULL,
     "nombre" TEXT NOT NULL,
     "apellido" TEXT NOT NULL,
-    "fecha" DATETIME NOT NULL,
+    "fecha" TIMESTAMP(3) NOT NULL,
     "turno" TEXT NOT NULL,
     "sinTacc" BOOLEAN NOT NULL DEFAULT false,
     "sinLactosa" BOOLEAN NOT NULL DEFAULT false,
     "vegetariano" BOOLEAN NOT NULL DEFAULT false,
     "vegano" BOOLEAN NOT NULL DEFAULT false,
     "comentarios" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Reserva_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "HuespedDemo" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "habitacion" TEXT NOT NULL,
     "nombre" TEXT NOT NULL,
     "apellido" TEXT NOT NULL,
-    "checkIn" DATETIME NOT NULL,
-    "checkOut" DATETIME NOT NULL
+    "checkIn" TIMESTAMP(3) NOT NULL,
+    "checkOut" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "HuespedDemo_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Configuracion" (
+    "id" TEXT NOT NULL DEFAULT 'config',
+    "bloqueado" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "Configuracion_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
