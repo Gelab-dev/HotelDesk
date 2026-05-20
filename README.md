@@ -1,36 +1,161 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HotelDesk
 
-## Getting Started
+Sistema de gestión de turnos de desayuno para hoteles. Permite a los huéspedes reservar su turno desde el celular vía QR, y al personal de recepción gestionar el día desde un panel de administración.
 
-First, run the development server:
+## Funcionalidades
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+**Vista huésped**
+- Verificación automática contra Cloudbeds (demo con datos de prueba)
+- Selección de turno con disponibilidad en tiempo real
+- Restricciones dietarias (Sin TACC, Sin lactosa, Vegetariano, Vegano)
+- Detección de reserva existente con opción de modificar
+- Soporte multiidioma (ES / EN / PT / FR)
+- Bloqueo visible cuando las reservas están cerradas
+
+**Panel de administración**
+- Vista diaria con navegación entre fechas
+- Reporte por turno: personas, restricciones y comentarios
+- Modal con detalle de huéspedes por turno
+- Buscador por habitación, nombre, apellido y/o fecha
+- Bloqueo de reservas con toggle
+- Exportar reporte CSV del día
+- Carga masiva de grupos desde Excel (.xlsx / .xls)
+- Plantilla Excel descargable
+
+## Stack
+
+- **Next.js 15** — App Router, Server Components, API Routes
+- **Prisma 7** — ORM con SQLite (desarrollo) / PostgreSQL (producción)
+- **TypeScript** — tipado estricto en toda la app
+- **Tailwind CSS** — estilos utilitarios
+- **xlsx** — lectura de archivos Excel para carga masiva
+
+## Estructura del proyecto
+
+```
+src/
+├── app/
+│   ├── api/              # API Routes (solo transporte HTTP)
+│   │   ├── reservas/
+│   │   ├── verificar/
+│   │   ├── disponibilidad/
+│   │   ├── buscar/
+│   │   ├── reporte/
+│   │   ├── grupos/
+│   │   └── configuracion/
+│   ├── admin/            # Página del panel de administración
+│   └── page.tsx          # Página del formulario del huésped
+├── components/
+│   ├── huesped/          # FormularioReserva
+│   └── admin/            # PanelAdmin
+├── hooks/                # Lógica de estado y fetching
+│   ├── useReservas.ts
+│   ├── useVerificarHuesped.ts
+│   ├── useDisponibilidad.ts
+│   └── useBuscador.ts
+├── services/             # Lógica de negocio
+│   ├── reservas.service.ts
+│   ├── huespedes.service.ts
+│   ├── grupos.service.ts
+│   ├── reporte.service.ts
+│   └── configuracion.service.ts
+├── lib/                  # Utilidades
+│   ├── prisma.ts
+│   ├── normalizar.ts
+│   ├── api-errors.ts
+│   ├── parse-json-response.ts
+│   └── validation-error.ts
+└── types/
+    └── index.ts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Instalación
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Requisitos:** Node.js 18+ y npm
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Clonar el repositorio
+git clone https://github.com/Gelab-dev/HotelDesk.git
+cd HotelDesk
 
-## Learn More
+# Instalar dependencias
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+# Configurar variables de entorno
+cp .env.example .env
+# Editar .env con la URL de la base de datos
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Ejecutar migraciones
+npx prisma migrate dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Generar cliente de Prisma
+npx prisma generate
 
-## Deploy on Vercel
+# Cargar huéspedes de prueba
+npx tsx prisma/seed.ts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Generar plantilla Excel para carga masiva
+npm run plantilla-grupos
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Iniciar en desarrollo
+npm run dev
+```
+
+La app queda disponible en `http://localhost:3000`.
+
+El panel de administración se accede en `http://localhost:3000/admin`.
+
+## Variables de entorno
+
+Crear un archivo `.env` en la raíz del proyecto:
+
+```env
+DATABASE_URL="file:./prisma/dev.db"
+```
+
+## Huéspedes de prueba
+
+El seed carga 10 huéspedes con estadías activas en mayo 2026. Algunos ejemplos:
+
+| Habitación | Nombre | Apellido | Check-in | Check-out |
+|---|---|---|---|---|
+| 101 | Maria | Garcia | 19/05 | 24/05 |
+| 303 | Juan Cruz | Gelabert | 20/05 | 27/05 |
+| 501 | Emma | Wilson | 20/05 | 24/05 |
+
+Para verificar un huésped en el formulario, los datos deben coincidir exactamente (sin distinguir mayúsculas ni acentos).
+
+## Carga masiva de grupos
+
+Descargar la plantilla desde el panel de administración → completar con los datos del grupo → subir con el botón "Carga masiva".
+
+Columnas del Excel:
+
+| Columna | Requerida | Valores aceptados |
+|---|---|---|
+| habitacion | Sí | Número de habitación |
+| nombre | Sí | Nombre del huésped |
+| apellido | Sí | Apellido del huésped |
+| fecha | Sí | YYYY-MM-DD |
+| turno | Sí | 07:30 / 08:30 / 09:30 |
+| sin_tacc | No | Sí/No, 1/0, vacío |
+| sin_lactosa | No | Sí/No, 1/0, vacío |
+| vegetariano | No | Sí/No, 1/0, vacío |
+| vegano | No | Sí/No, 1/0, vacío |
+| comentarios | No | Texto libre |
+
+## Producción
+
+Para migrar a PostgreSQL en producción, reemplazá el provider en `prisma/schema.prisma`:
+
+```prisma
+datasource db {
+  provider = "postgresql"
+}
+```
+
+Y actualizá `DATABASE_URL` en las variables de entorno de Vercel con la URL de tu base de datos.
+
+---
+
+Desarrollado por [Gelab](https://gelab.dev) — automatizamos negocios argentinos con IA y desarrollo web.
